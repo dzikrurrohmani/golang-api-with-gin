@@ -13,6 +13,26 @@ func main() {
 		c.String(200, "Health Check")
 	})
 
+	routerEngine.Use(AuthMiddleware())
+
+	/*
+	* grouping outh
+	* www.enigmacamp.com/outh/login
+	* www.enigmacamp.com/outh/register
+	* www.enigmacamp.com/outh/logout
+
+	* grouping master
+	* www.enigmacamp.com/master/login
+	* www.enigmacamp.com/master/register
+	* www.enigmacamp.com/master/logout
+	 */
+
+	rgAuth := routerEngine.Group("/api/auth")
+	rgAuth.POST("login5", login5)
+
+	rgMaster := routerEngine.Group("/api/master")
+	rgMaster.GET("greeting2/:name", greeting2)
+
 	routerEngine.GET("/greeting1/:name", greeting1)
 	routerEngine.GET("/greeting2/:name", greeting2)
 
@@ -21,6 +41,7 @@ func main() {
 	routerEngine.POST("/login3", login3)
 	routerEngine.POST("/login4", login4)
 	routerEngine.POST("/login5", login5)
+
 	err := routerEngine.Run() // secara default menggunakan port :8080
 	// err := routerEngine.Run(:8888) // ganti port
 	if err != nil {
@@ -91,15 +112,14 @@ func login4(c *gin.Context) {
 
 func login5(c *gin.Context) {
 	var uc UserCredential
-	if err := c.ShouldBindJSON(&uc); err != nil {
+	if err := c.BindJSON(&uc); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		fmt.Println(err.Error())
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "OK",
-			"data":    uc.Username,
+			"token":    "ini_token",
 		})
 	}
 }
